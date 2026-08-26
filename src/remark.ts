@@ -23,6 +23,7 @@ export interface ProductRecord {
   rating?: number
   reviewCount?: number
   detailPageUrl?: string
+  brand?: string
 }
 
 export interface RemarkAmazonOptions {
@@ -56,6 +57,7 @@ function toCardData(asin: string, product: ProductRecord | undefined, tag: strin
     ...(product?.description !== undefined ? { description: product.description } : {}),
     ...(product?.rating !== undefined ? { rating: product.rating } : {}),
     ...(product?.reviewCount !== undefined ? { reviewCount: product.reviewCount } : {}),
+    ...(product?.brand ? { brand: product.brand } : {}),
   }
 }
 

@@ -19,22 +19,35 @@ export interface AmazonCardData {
   description?: string
   rating?: number
   reviewCount?: number
+  /** Manufacturer, shown as the kicker — the part of the name that identifies it. */
+  brand?: string
 }
 
 /** Per-site wording and theming. Every field has a neutral default. */
 export interface CardLabels {
   /**
-   * Advertising disclosure shown above the title. Defaults to 「PR」 and should
-   * only be changed to different wording, never emptied: Japanese ステマ規制
-   * requires affiliate placements to be disclosed.
+   * Overrides the kicker above the title, which otherwise shows the brand.
+   *
+   * Set this to 「PR」 or 「広告」 to carry the ステマ規制 disclosure on the card
+   * itself. It is not on by default: a site can equally disclose once per
+   * article, and repeating it on every card is the noisier of the two.
    */
   kicker?: string
   /** Label for the non-Amazon shop row. */
   shopsLabel?: string
   /** Call to action on the main link. */
   cta?: string
-  /** Whether to print the ASIN. */
+  /**
+   * Print the ASIN next to the kicker. Off by default — it identifies the
+   * product to Amazon, not to a reader.
+   */
   showAsin?: boolean
+  /**
+   * Show the product description. Off by default: Amazon's description is
+   * keyword-stuffed marketing copy of the same kind as the title, so it
+   * doubles the noise without adding information.
+   */
+  showDescription?: boolean
   /** Extra class on the card root, for a site's own skin. */
   frameClass?: string
   /**
@@ -49,10 +62,11 @@ export interface CardLabels {
 }
 
 const DEFAULT_LABELS = {
-  kicker: 'PR',
+  kicker: '',
   shopsLabel: '他で探す',
   cta: 'Amazonで見る',
-  showAsin: true,
+  showAsin: false,
+  showDescription: false,
   frameClass: '',
   linkClass: '',
 } as const satisfies Required<CardLabels>
@@ -127,7 +141,7 @@ export function renderAmazonCard(
   shops: ShopLinks,
   labels: CardLabels = {},
 ): string {
-  const { kicker, shopsLabel, cta, showAsin, frameClass, linkClass } = {
+  const { kicker, shopsLabel, cta, showAsin, showDescription, frameClass, linkClass } = {
     ...DEFAULT_LABELS,
     ...labels,
   }
@@ -139,12 +153,23 @@ export function renderAmazonCard(
     ? `<span class="amazon-card__media"><img src="${escapeHtml(data.image)}" alt="${safeTitle}" loading="lazy" /></span>`
     : `<span class="amazon-card__media amazon-card__media--empty">${AMAZON_MARK_SVG}</span>`
 
-  const description = data.description
-    ? `<span class="amazon-card__description">${escapeHtml(data.description)}</span>`
-    : ''
+  const description =
+    showDescription && data.description
+      ? `<span class="amazon-card__description">${escapeHtml(data.description)}</span>`
+      : ''
 
   const asinTag =
     showAsin && asin ? `<span class="amazon-card__asin">ASIN ${escapeHtml(asin)}</span>` : ''
+
+  // The kicker carries the brand unless a site overrides it. With neither, the
+  // row is dropped rather than left as an empty gap above the title.
+  const kickerText = kicker || data.brand || ''
+  const kickerRow =
+    kickerText || asinTag
+      ? `<span class="amazon-card__kicker">${
+          kickerText ? `<span class="amazon-card__kicker-tag">${escapeHtml(kickerText)}</span>` : ''
+        }${asinTag}</span>`
+      : ''
 
   const rootClass = ['amazon-card', frameClass].filter(Boolean).join(' ')
 
@@ -152,7 +177,7 @@ export function renderAmazonCard(
   <a class="${['amazon-card__link', linkClass].filter(Boolean).join(' ')}" href="${escapeHtml(data.url)}" target="_blank" ${OUTBOUND_REL}>
     ${media}
     <span class="amazon-card__body">
-      <span class="amazon-card__kicker"><span class="amazon-card__kicker-tag">${escapeHtml(kicker)}</span>${asinTag}</span>
+      ${kickerRow}
       <span class="amazon-card__title">${safeTitle}</span>
       ${renderRating(data.rating ?? 0, data.reviewCount ?? 0)}
       ${description}

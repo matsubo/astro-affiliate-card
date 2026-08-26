@@ -15,13 +15,11 @@ const product = {
 }
 
 describe('renderAmazonCard', () => {
-  test('renders the title, image, price, description and ASIN', () => {
+  test('renders the title, image and price', () => {
     const html = renderAmazonCard(product, {})
     expect(html).toContain(product.title)
     expect(html).toContain(product.image)
     expect(html).toContain('￥3,059')
-    expect(html).toContain(product.description)
-    expect(html).toContain('B00TQMO5E0')
   })
 
   test('renders the rating only when there is a real one', () => {
@@ -48,8 +46,9 @@ describe('renderAmazonCard', () => {
   // unescaped otherwise.
   test('escapes HTML in every interpolated field', () => {
     const html = renderAmazonCard(
-      { ...product, title: '<script>alert(1)</script>', description: 'a & b' },
+      { ...product, title: '<script>alert(1)</script>', description: 'a & b', brand: 'a & b' },
       {},
+      { showDescription: true },
     )
     expect(html).not.toContain('<script>')
     expect(html).toContain('&lt;script&gt;')
@@ -63,22 +62,37 @@ describe('renderAmazonCard', () => {
   })
 })
 
-describe('renderAmazonCard — disclosure and wording', () => {
-  // ステマ規制: the ad disclosure is a legal requirement, so it is present
-  // unless a site deliberately overrides it.
-  test('discloses the card as advertising by default', () => {
-    expect(renderAmazonCard(product, {})).toContain('PR')
+describe('renderAmazonCard — information design', () => {
+  // Amazon titles are keyword-stuffed for search, not for reading. The brand
+  // is the part that actually identifies the product at a glance.
+  test('leads with the brand rather than a compliance tag or an ASIN', () => {
+    const html = renderAmazonCard({ ...product, brand: 'ROCKBROS' }, {})
+    expect(html).toContain('ROCKBROS')
+    expect(html).not.toContain('>PR<')
+    expect(html).not.toContain('ASIN')
   })
 
-  test('uses neutral Japanese defaults rather than any one site’s voice', () => {
+  test('omits the kicker entirely when the product has no brand', () => {
     const html = renderAmazonCard(product, {})
-    expect(html).not.toContain('PARTS REGISTRY')
-    expect(html).not.toContain('ALT SOURCES')
-    expect(html).not.toContain('hud-')
+    expect(html).not.toContain('amazon-card__kicker')
   })
 
-  // impreza-gdb keeps its current wording and HUD skin through options alone.
-  test('lets a site override every label and add a theme class', () => {
+  // The Amazon description is more marketing copy of the same kind; showing it
+  // doubles the noise without telling the reader anything new.
+  test('hides the description unless a site asks for it', () => {
+    expect(renderAmazonCard(product, {})).not.toContain(product.description)
+    expect(renderAmazonCard(product, {}, { showDescription: true })).toContain(
+      product.description,
+    )
+  })
+
+  test('still exposes the ASIN and a disclosure for sites that want them', () => {
+    const html = renderAmazonCard(product, {}, { showAsin: true, kicker: 'PR' })
+    expect(html).toContain('B00TQMO5E0')
+    expect(html).toContain('PR')
+  })
+
+  test('lets a site override the wording and add a theme class', () => {
     const html = renderAmazonCard(product, {}, {
       kicker: '// PARTS REGISTRY',
       cta: 'Amazonで詳細を見る',
@@ -100,10 +114,6 @@ describe('renderAmazonCard — disclosure and wording', () => {
     const anchors = html.match(/<a class="[^"]*"/g) ?? []
     expect(anchors.length).toBeGreaterThan(1)
     for (const a of anchors) expect(a).toContain('no-styling')
-  })
-
-  test('can hide the ASIN readout', () => {
-    expect(renderAmazonCard(product, {}, { showAsin: false })).not.toContain('B00TQMO5E0<')
   })
 })
 
