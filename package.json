@@ -44,7 +44,7 @@
     "unist-util-visit": "^5.0.0"
   },
   "peerDependencies": {
-    "astro": "^5.0.0 || ^6.0.0 || ^7.0.0"
+    "astro": "^7.2.7"
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -55,7 +55,8 @@
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.2",
     "typescript": "^5.9.0",
-    "unified": "^11.0.5"
+    "unified": "^11.0.5",
+    "vite": "^8.2.2"
   },
   "engines": {
     "node": ">=20"
