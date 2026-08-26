@@ -9,6 +9,9 @@ directive, with optional Rakuten and Yahoo! Shopping links alongside.
 ::amazon{asin="B00TQMO5E0"}
 ```
 
+<img width="835" height="324" alt="image" src="https://github.com/user-attachments/assets/39ddfbda-8fc9-42f7-bbd1-3c4bebb0a2d8" />
+
+
 Product data comes from the Amazon Creators API, is committed to your
 repository as JSON, and is refreshed with a CLI — so builds and deploys never
 depend on the API being up.
