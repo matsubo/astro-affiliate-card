@@ -1,12 +1,15 @@
 /// <reference types="bun" />
-import { describe, expect, test } from 'bun:test'
+import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import rehypeStringify from 'rehype-stringify'
 import remarkDirective from 'remark-directive'
 import remarkGfm from 'remark-gfm'
 import remarkParse from 'remark-parse'
 import remarkRehype from 'remark-rehype'
 import { unified } from 'unified'
-import { remarkAmazon, type RemarkAmazonOptions } from './remark.js'
+import { createRemarkAmazon, remarkAmazon, type RemarkAmazonOptions } from './remark.js'
 
 const products = {
   B00TQMO5E0: {
@@ -131,5 +134,69 @@ describe('remarkAmazon — shop search keyword', () => {
     // The full title would over-specify the search into zero hits.
     expect(html).not.toContain(twice(title))
     expect(html).toContain(twice('[ROCKBROS]'))
+  })
+})
+
+// The entry point for a site that declares `markdown.processor` itself. Astro 7
+// runs no remark plugins through its default processor, so three of the four
+// sites this package serves reach cards only through this call -- and it went
+// two releases without a test of its own.
+describe('createRemarkAmazon', () => {
+  let root: string
+  let savedTag: string | undefined
+
+  beforeEach(() => {
+    root = mkdtempSync(join(tmpdir(), 'affiliate-card-remark-'))
+    writeFileSync(join(root, 'products.json'), JSON.stringify(products))
+    savedTag = process.env.AMAZON_AFFILIATE_TAG
+    process.env.AMAZON_AFFILIATE_TAG = 'triathlon01-22'
+  })
+
+  afterEach(() => {
+    if (savedTag === undefined) delete process.env.AMAZON_AFFILIATE_TAG
+    else process.env.AMAZON_AFFILIATE_TAG = savedTag
+    rmSync(root, { recursive: true, force: true })
+  })
+
+  /** Resolution logs through the console when no Astro logger exists. */
+  function quietly<T>(run: () => T): T {
+    const originalLog = console.log
+    const originalWarn = console.warn
+    console.log = () => {}
+    console.warn = () => {}
+    try {
+      return run()
+    } finally {
+      console.log = originalLog
+      console.warn = originalWarn
+    }
+  }
+
+  test('hands back the plugin already carrying the resolved options', () => {
+    const [plugin, options] = quietly(() =>
+      createRemarkAmazon({ root, dataFile: 'products.json' }),
+    )
+
+    expect(plugin).toBe(remarkAmazon)
+    expect(options.products).toEqual(products)
+    expect(options.affiliateTag).toBe('triathlon01-22')
+  })
+
+  test('renders a card inside a processor that places the plugin itself', () => {
+    const configured = quietly(() => createRemarkAmazon({ root, dataFile: 'products.json' }))
+    const html = String(
+      unified()
+        .use(remarkParse)
+        .use(remarkGfm)
+        .use(remarkDirective)
+        .use(...configured)
+        .use(remarkRehype, { allowDangerousHtml: true })
+        .use(rehypeStringify, { allowDangerousHtml: true })
+        .processSync('::amazon{asin="B00TQMO5E0"}'),
+    )
+
+    expect(html).toContain('Mag-on')
+    expect(html).toContain('tag=triathlon01-22')
+    expect(html).not.toContain('::amazon')
   })
 })

@@ -65,4 +65,22 @@ describe('withRetry', () => {
     expect(calls).toBe(1)
     expect(res.status).toBe(401)
   })
+
+  // The default sleep is what a real sync uses; every other test injects one, so
+  // nothing exercised it. Retry-After: 0 keeps the wait at a real setTimeout(0).
+  test('waits on its own when no sleep is injected', async () => {
+    let calls = 0
+    const res = await withRetry(
+      async () => {
+        calls += 1
+        return calls < 2
+          ? new Response('', { status: 503, headers: { 'retry-after': '0' } })
+          : new Response('ok', { status: 200 })
+      },
+      { attempts: 2 },
+    )
+
+    expect(calls).toBe(2)
+    expect(res.status).toBe(200)
+  })
 })
