@@ -1,0 +1,58 @@
+{
+  "name": "astro-affiliate-card",
+  "version": "0.1.0",
+  "description": "Astro integration for Amazon / Rakuten / Yahoo! affiliate product cards",
+  "keywords": ["astro", "astro-integration", "affiliate", "amazon", "rakuten", "yahoo"],
+  "license": "MIT",
+  "author": "matsubo",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matsubo/astro-affiliate-card.git"
+  },
+  "type": "module",
+  "files": ["dist"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./card": {
+      "types": "./dist/card.d.ts",
+      "default": "./dist/card.js"
+    },
+    "./shops": {
+      "types": "./dist/shops.d.ts",
+      "default": "./dist/shops.js"
+    },
+    "./remark": {
+      "types": "./dist/remark.d.ts",
+      "default": "./dist/remark.js"
+    },
+    "./card.css": "./dist/card.css"
+  },
+  "bin": {
+    "affiliate-card": "./dist/bin/fetch.js"
+  },
+  "scripts": {
+    "build": "tsc && cp src/card.css dist/card.css",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "bun run test && bun run build"
+  },
+  "dependencies": {
+    "mdast-util-directive": "^3.0.0",
+    "unist-util-visit": "^5.0.0"
+  },
+  "peerDependencies": {
+    "astro": "^5.0.0 || ^6.0.0 || ^7.0.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/mdast": "^4.0.4",
+    "typescript": "^5.9.0",
+    "unified": "^11.0.5"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
