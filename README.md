@@ -19,20 +19,27 @@ depend on the API being up.
 ## Install
 
 ```sh
-bun add astro-affiliate-card
+bun add astro-affiliate-card remark-directive
 ```
 
 ```js
 // astro.config.mjs
 import affiliateCard from 'astro-affiliate-card'
+import remarkDirective from 'remark-directive'
 
 export default defineConfig({
+  markdown: { remarkPlugins: [remarkDirective] },
   integrations: [affiliateCard()],
 })
 ```
 
-The integration registers the remark plugin and injects the stylesheet. Nothing
-else to wire up.
+The integration registers its own remark plugin and injects the stylesheet.
+`remark-directive` is yours to register: Astro does not parse `::amazon`
+syntax on its own, and without it the directive reaches the page as literal
+text. Sites that only convert bare Amazon URLs (`bareUrls: true`) do not need
+it.
+
+Astro 4, 5, 6 and 7 are supported.
 
 ### Sites that declare `markdown.processor`
 
