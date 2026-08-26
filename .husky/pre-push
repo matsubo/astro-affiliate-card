@@ -1,0 +1,4 @@
+# What CI will run anyway -- catching it here costs seconds, catching it in CI
+# costs a round trip. Coverage is part of it: the threshold gates per file.
+bun run typecheck
+bun run test:coverage

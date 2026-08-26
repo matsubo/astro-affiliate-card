@@ -47,7 +47,16 @@
     "test": "bun test",
     "test:coverage": "bun test --coverage",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "bun run test && bun run build"
+    "prepublishOnly": "bun run lint:ci && bun run typecheck && bun run test:coverage && bun run build",
+    "format": "biome format --write ./src",
+    "lint": "biome check --write ./src",
+    "lint:ci": "biome ci ./src",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "src/**/*.ts": [
+      "biome check --write --no-errors-on-unmatched"
+    ]
   },
   "dependencies": {
     "mdast-util-directive": "^3.0.0",
@@ -57,8 +66,11 @@
     "astro": "^7.2.7"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.5.10",
     "@types/bun": "latest",
     "@types/mdast": "^4.0.4",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.3.0",
     "rehype-stringify": "^10.0.1",
     "remark-directive": "^4.0.0",
     "remark-gfm": "^4.0.1",
