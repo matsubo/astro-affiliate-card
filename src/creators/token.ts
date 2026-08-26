@@ -4,12 +4,7 @@
 // this mints one on first use and holds it in memory for the process lifetime;
 // nothing is written to disk.
 
-import {
-  SCOPE_COGNITO,
-  SCOPE_LWA,
-  usesLoginWithAmazon,
-  type CreatorsConfig,
-} from './config.js'
+import { type CreatorsConfig, SCOPE_COGNITO, SCOPE_LWA, usesLoginWithAmazon } from './config.js'
 
 const EXPIRY_LEEWAY_MS = 60_000
 const MAX_ERROR_BODY_LENGTH = 300

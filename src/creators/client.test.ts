@@ -1,7 +1,7 @@
 /// <reference types="bun" />
 import { describe, expect, test } from 'bun:test'
 import { createClient } from './client.js'
-import { loadConfig, type CreatorsConfig } from './config.js'
+import { type CreatorsConfig, loadConfig } from './config.js'
 import type { TokenManager } from './token.js'
 
 function config(credentialVersion = '3.3', marketplace = 'www.amazon.co.jp'): CreatorsConfig {
@@ -14,7 +14,11 @@ function config(credentialVersion = '3.3', marketplace = 'www.amazon.co.jp'): Cr
   })
 }
 
-const tokenManager: TokenManager = { async get() { return 'tok-1' } }
+const tokenManager: TokenManager = {
+  async get() {
+    return 'tok-1'
+  },
+}
 
 const ITEM = {
   asin: 'B00TQMO5E0',
@@ -73,7 +77,9 @@ describe('getItems — request', () => {
     expect(lwa.calls[0]!.headers.Authorization).toBe('Bearer tok-1')
 
     const cognito = recordingFetch()
-    await createClient(config('2.3'), { fetchImpl: cognito.fetchImpl, tokenManager }).getItems(['B0'])
+    await createClient(config('2.3'), { fetchImpl: cognito.fetchImpl, tokenManager }).getItems([
+      'B0',
+    ])
     expect(cognito.calls[0]!.headers.Authorization).toBe('Bearer tok-1, Version 2.3')
   })
 
@@ -119,7 +125,9 @@ describe('getItems — request', () => {
 describe('getItems — response', () => {
   test('returns the parsed products', async () => {
     const { fetchImpl } = recordingFetch()
-    const result = await createClient(config(), { fetchImpl, tokenManager }).getItems(['B00TQMO5E0'])
+    const result = await createClient(config(), { fetchImpl, tokenManager }).getItems([
+      'B00TQMO5E0',
+    ])
     expect(result.products.B00TQMO5E0?.title).toBe('Mag-on エナジージェル')
     expect(result.errors).toEqual([])
   })
@@ -128,7 +136,9 @@ describe('getItems — response', () => {
     const fetchImpl = (async () =>
       new Response('AccessDenied', { status: 403 })) as unknown as typeof fetch
     const client = createClient(config(), { fetchImpl, tokenManager })
-    await expect(client.getItems(['B0'])).rejects.toThrow(/getItems failed with HTTP 403: AccessDenied/)
+    await expect(client.getItems(['B0'])).rejects.toThrow(
+      /getItems failed with HTTP 403: AccessDenied/,
+    )
   })
 
   test('truncates a long error body', async () => {

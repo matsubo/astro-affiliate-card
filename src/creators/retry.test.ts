@@ -8,7 +8,9 @@ function throttled(): Response {
 
 describe('withRetry', () => {
   test('returns the first success untouched', async () => {
-    const res = await withRetry(async () => new Response('ok', { status: 200 }), { sleep: async () => {} })
+    const res = await withRetry(async () => new Response('ok', { status: 200 }), {
+      sleep: async () => {},
+    })
     expect(res.status).toBe(200)
   })
 
@@ -43,7 +45,12 @@ describe('withRetry', () => {
     const waits: number[] = []
     await withRetry(
       async () => new Response('', { status: 429, headers: { 'retry-after': '7' } }),
-      { attempts: 2, sleep: async (ms) => { waits.push(ms) } },
+      {
+        attempts: 2,
+        sleep: async (ms) => {
+          waits.push(ms)
+        },
+      },
     )
     expect(waits[0]).toBe(7000)
   })

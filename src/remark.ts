@@ -10,8 +10,8 @@ import type { Root } from 'mdast'
 import type {} from 'mdast-util-directive'
 import type { Plugin } from 'unified'
 import { visit } from 'unist-util-visit'
-import { renderAmazonCard, type AmazonCardData, type CardLabels } from './card.js'
-import { resolveOptions, type AffiliateCardOptions } from './options.js'
+import { type AmazonCardData, type CardLabels, renderAmazonCard } from './card.js'
+import { type AffiliateCardOptions, resolveOptions } from './options.js'
 import {
   deriveSearchKeyword,
   extractAsin,

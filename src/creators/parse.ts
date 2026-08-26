@@ -85,7 +85,9 @@ function toProduct(item: unknown): CreatorsProduct | null {
     detailPageUrl,
     brand: asString(dig(item, 'itemInfo', 'byLineInfo', 'brand', 'displayValue')),
     model: asString(dig(item, 'itemInfo', 'manufactureInfo', 'model', 'displayValue')),
-    partNumber: asString(dig(item, 'itemInfo', 'manufactureInfo', 'itemPartNumber', 'displayValue')),
+    partNumber: asString(
+      dig(item, 'itemInfo', 'manufactureInfo', 'itemPartNumber', 'displayValue'),
+    ),
   }
 }
 

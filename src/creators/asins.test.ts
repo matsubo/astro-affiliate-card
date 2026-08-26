@@ -11,9 +11,9 @@ describe('extractAsinsFromContent', () => {
   })
 
   test('finds a directive carrying extra attributes', () => {
-    expect(
-      extractAsinsFromContent('::amazon{asin="B00TQMO5E0" title="エナジージェル"}'),
-    ).toEqual(['B00TQMO5E0'])
+    expect(extractAsinsFromContent('::amazon{asin="B00TQMO5E0" title="エナジージェル"}')).toEqual([
+      'B00TQMO5E0',
+    ])
   })
 
   // MDX posts use the component form instead of the directive.

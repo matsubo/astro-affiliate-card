@@ -14,7 +14,7 @@ function product(title: string): CreatorsProduct {
     description: '',
     rating: 4.3,
     reviewCount: 217,
-    detailPageUrl: 'https://www.amazon.co.jp/dp/X?tag=' + TAG,
+    detailPageUrl: `https://www.amazon.co.jp/dp/X?tag=${TAG}`,
     brand: '',
     model: '',
     partNumber: '',

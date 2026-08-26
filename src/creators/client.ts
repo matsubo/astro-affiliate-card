@@ -4,9 +4,9 @@
 // `x-marketplace` header rather than a regional endpoint.
 
 import { API_HOST, authorizationHeader, type CreatorsConfig } from './config.js'
-import { parseGetItemsResponse, type GetItemsResult } from './parse.js'
+import { type GetItemsResult, parseGetItemsResponse } from './parse.js'
 import { buildGetItemsBody, GET_ITEMS_PATH } from './request.js'
-import { withRetry, type RetryOptions } from './retry.js'
+import { type RetryOptions, withRetry } from './retry.js'
 import type { TokenManager } from './token.js'
 
 const MAX_ERROR_BODY_LENGTH = 300
@@ -59,7 +59,9 @@ export function createClient(
 
       if (!response.ok) {
         const detail = (await response.text().catch(() => '')).slice(0, MAX_ERROR_BODY_LENGTH)
-        throw new Error(`getItems failed with HTTP ${response.status}${detail ? `: ${detail}` : ''}`)
+        throw new Error(
+          `getItems failed with HTTP ${response.status}${detail ? `: ${detail}` : ''}`,
+        )
       }
 
       return parseGetItemsResponse(await response.json())

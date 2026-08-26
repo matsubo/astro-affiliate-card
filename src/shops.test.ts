@@ -4,9 +4,9 @@ import {
   buildRakutenSearchUrl,
   buildYahooBeaconUrl,
   buildYahooSearchUrl,
+  deriveSearchKeyword,
   extractAsin,
   isAmazonUrl,
-  deriveSearchKeyword,
   resolveShopLinks,
 } from './shops.js'
 
@@ -117,7 +117,8 @@ describe('deriveSearchKeyword', () => {
   // over-specify the search into zero hits, so the shop buttons land on an
   // empty results page -- which is worse than not showing them.
   test('condenses a keyword-stuffed title to whole tokens under ~30 chars', () => {
-    const title = '【PS5対応】メーカー保証3年 ROCKBROS 偏光サングラス 交換可能レンズ2枚 UV400 紫外線カット'
+    const title =
+      '【PS5対応】メーカー保証3年 ROCKBROS 偏光サングラス 交換可能レンズ2枚 UV400 紫外線カット'
     const keyword = deriveSearchKeyword({ title })
     // 【】 segments go; the rest is trimmed to whole tokens. It does not try to
     // guess which token is the brand -- that is what partNumber/model are for.
@@ -128,18 +129,24 @@ describe('deriveSearchKeyword', () => {
   })
 
   test('prefers a part number over the title', () => {
-    expect(deriveSearchKeyword({ title: '長い長い商品名', product: { partNumber: 'T2875.72' } })).toBe(
-      'T2875.72',
-    )
+    expect(
+      deriveSearchKeyword({ title: '長い長い商品名', product: { partNumber: 'T2875.72' } }),
+    ).toBe('T2875.72')
   })
 
   test('falls back to the model when there is no part number', () => {
-    expect(deriveSearchKeyword({ title: '長い長い商品名', product: { model: 'NEO 2T' } })).toBe('NEO 2T')
+    expect(deriveSearchKeyword({ title: '長い長い商品名', product: { model: 'NEO 2T' } })).toBe(
+      'NEO 2T',
+    )
   })
 
   test('an explicit kw beats everything', () => {
     expect(
-      deriveSearchKeyword({ kw: 'メダリスト ジェル', title: '長い商品名', product: { partNumber: 'X1' } }),
+      deriveSearchKeyword({
+        kw: 'メダリスト ジェル',
+        title: '長い商品名',
+        product: { partNumber: 'X1' },
+      }),
     ).toBe('メダリスト ジェル')
   })
 

@@ -4,7 +4,7 @@
 // directly: the CLI supplies the file reading, writing and the real client.
 
 import type { CreatorsClient } from './client.js'
-import { resolveMissing, type CreatorsProduct } from './parse.js'
+import { type CreatorsProduct, resolveMissing } from './parse.js'
 import { chunk, isSystemicFailure, MAX_ITEMS_PER_REQUEST } from './request.js'
 
 const CACHE_TTL_MS = 90 * 24 * 60 * 60 * 1000

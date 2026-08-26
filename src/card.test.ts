@@ -81,9 +81,7 @@ describe('renderAmazonCard — information design', () => {
   // doubles the noise without telling the reader anything new.
   test('hides the description unless a site asks for it', () => {
     expect(renderAmazonCard(product, {})).not.toContain(product.description)
-    expect(renderAmazonCard(product, {}, { showDescription: true })).toContain(
-      product.description,
-    )
+    expect(renderAmazonCard(product, {}, { showDescription: true })).toContain(product.description)
   })
 
   test('still exposes the ASIN and a disclosure for sites that want them', () => {
@@ -93,11 +91,15 @@ describe('renderAmazonCard — information design', () => {
   })
 
   test('lets a site override the wording and add a theme class', () => {
-    const html = renderAmazonCard(product, {}, {
-      kicker: '// PARTS REGISTRY',
-      cta: 'Amazonで詳細を見る',
-      frameClass: 'hud-frame',
-    })
+    const html = renderAmazonCard(
+      product,
+      {},
+      {
+        kicker: '// PARTS REGISTRY',
+        cta: 'Amazonで詳細を見る',
+        frameClass: 'hud-frame',
+      },
+    )
     expect(html).toContain('// PARTS REGISTRY')
     expect(html).toContain('Amazonで詳細を見る')
     expect(html).toContain('hud-frame')

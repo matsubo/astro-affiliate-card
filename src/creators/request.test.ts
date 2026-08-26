@@ -1,11 +1,6 @@
 /// <reference types="bun" />
 import { describe, expect, test } from 'bun:test'
-import {
-  buildGetItemsBody,
-  chunk,
-  isSystemicFailure,
-  MAX_ITEMS_PER_REQUEST,
-} from './request.js'
+import { buildGetItemsBody, chunk, isSystemicFailure, MAX_ITEMS_PER_REQUEST } from './request.js'
 
 describe('chunk', () => {
   test('splits into batches of the given size, remainder last', () => {
@@ -13,7 +8,10 @@ describe('chunk', () => {
   })
 
   test('leaves an exact multiple without a trailing empty batch', () => {
-    expect(chunk([1, 2, 3, 4], 2)).toEqual([[1, 2], [3, 4]])
+    expect(chunk([1, 2, 3, 4], 2)).toEqual([
+      [1, 2],
+      [3, 4],
+    ])
   })
 
   test('yields no batches for an empty input', () => {

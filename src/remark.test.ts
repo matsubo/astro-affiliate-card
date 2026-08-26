@@ -9,7 +9,7 @@ import remarkGfm from 'remark-gfm'
 import remarkParse from 'remark-parse'
 import remarkRehype from 'remark-rehype'
 import { unified } from 'unified'
-import { createRemarkAmazon, remarkAmazon, type RemarkAmazonOptions } from './remark.js'
+import { createRemarkAmazon, type RemarkAmazonOptions, remarkAmazon } from './remark.js'
 
 const products = {
   B00TQMO5E0: {
@@ -111,7 +111,10 @@ describe('remarkAmazon — shop search keyword', () => {
     const html = render('::amazon{asin="B0PART0001"}', {
       credentials: creds,
       products: {
-        B0PART0001: { title: '【保証3年】タックス スマートトレーナー NEO 2T 対応', partNumber: 'T2875.72' },
+        B0PART0001: {
+          title: '【保証3年】タックス スマートトレーナー NEO 2T 対応',
+          partNumber: 'T2875.72',
+        },
       },
     })
     expect(html).toContain(encodeURIComponent('T2875.72'))
@@ -173,9 +176,7 @@ describe('createRemarkAmazon', () => {
   }
 
   test('hands back the plugin already carrying the resolved options', () => {
-    const [plugin, options] = quietly(() =>
-      createRemarkAmazon({ root, dataFile: 'products.json' }),
-    )
+    const [plugin, options] = quietly(() => createRemarkAmazon({ root, dataFile: 'products.json' }))
 
     expect(plugin).toBe(remarkAmazon)
     expect(options.products).toEqual(products)

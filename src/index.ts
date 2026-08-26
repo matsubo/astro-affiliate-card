@@ -2,7 +2,7 @@
 // stylesheet, so a site's astro.config only names this once.
 
 import type { AstroIntegration } from 'astro'
-import { resolveOptions, type AffiliateCardOptions } from './options.js'
+import { type AffiliateCardOptions, resolveOptions } from './options.js'
 import { remarkAmazon } from './remark.js'
 
 export type { AmazonCardData, CardLabels } from './card.js'
@@ -10,9 +10,9 @@ export { renderAmazonCard } from './card.js'
 export type { AffiliateCardOptions } from './options.js'
 export {
   createRemarkAmazon,
-  remarkAmazon,
   type ProductRecord,
   type RemarkAmazonOptions,
+  remarkAmazon,
 } from './remark.js'
 export * from './shops.js'
 

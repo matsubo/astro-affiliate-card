@@ -136,9 +136,9 @@ describe('loadConfig', () => {
   })
 
   test('rejects an unknown credential version before any request is made', () => {
-    expect(() =>
-      loadConfig({ ...VALID_ENV, AMAZON_CREATOR_CREDENTIAL_VERSION: '9.9' }),
-    ).toThrow(/Unknown Creators API credential version/)
+    expect(() => loadConfig({ ...VALID_ENV, AMAZON_CREATOR_CREDENTIAL_VERSION: '9.9' })).toThrow(
+      /Unknown Creators API credential version/,
+    )
   })
 
   test('returns a frozen configuration', () => {

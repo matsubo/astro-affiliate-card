@@ -123,7 +123,10 @@ describe('affiliate-card fetch', () => {
   // Someone pointing PA-API v5 keys at this needs telling that Amazon retired
   // that API rather than debugging a 401.
   test('explains that PA-API v5 keys are not Creators API credentials', async () => {
-    const { stderr } = await run(cwd, [], { AMAZON_API_KEY: 'AKIA...', AMAZON_API_SECRET: 'secret' })
+    const { stderr } = await run(cwd, [], {
+      AMAZON_API_KEY: 'AKIA...',
+      AMAZON_API_SECRET: 'secret',
+    })
     expect(stderr).toContain('PA-API v5 credentials')
   })
 })

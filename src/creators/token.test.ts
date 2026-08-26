@@ -1,6 +1,6 @@
 /// <reference types="bun" />
 import { describe, expect, test } from 'bun:test'
-import { loadConfig, type CreatorsConfig } from './config.js'
+import { type CreatorsConfig, loadConfig } from './config.js'
 import { createTokenManager } from './token.js'
 
 const SECRET = 'super-secret-credential'

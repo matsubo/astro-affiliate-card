@@ -7,7 +7,7 @@ const TAG = 'triathlon01-22'
 /** A getItems reply in the casing Amazon documents. */
 const camelCaseItem = {
   asin: 'B00TQMO5E0',
-  detailPageUrl: 'https://www.amazon.co.jp/dp/B00TQMO5E0?tag=' + TAG,
+  detailPageUrl: `https://www.amazon.co.jp/dp/B00TQMO5E0?tag=${TAG}`,
   itemInfo: {
     title: { displayValue: 'Mag-on エナジージェル' },
     features: { displayValues: ['マグネシウムを配合したエナジージェル'] },
@@ -21,7 +21,12 @@ const camelCaseItem = {
   customerReviews: { starRating: { value: 4.3 }, count: 217 },
   offersV2: {
     listings: [
-      { price: { money: { displayAmount: '￥3,059' }, savingBasis: { money: { displayAmount: '￥3,500' } } } },
+      {
+        price: {
+          money: { displayAmount: '￥3,059' },
+          savingBasis: { money: { displayAmount: '￥3,500' } },
+        },
+      },
     ],
   },
 }
@@ -29,7 +34,7 @@ const camelCaseItem = {
 /** The same reply with PA-API v5 style PascalCase, which has been seen in the wild. */
 const pascalCaseItem = {
   ASIN: 'B00TQMO5E0',
-  DetailPageURL: 'https://www.amazon.co.jp/dp/B00TQMO5E0?tag=' + TAG,
+  DetailPageURL: `https://www.amazon.co.jp/dp/B00TQMO5E0?tag=${TAG}`,
   ItemInfo: {
     Title: { DisplayValue: 'Mag-on エナジージェル' },
     Features: { DisplayValues: ['マグネシウムを配合したエナジージェル'] },
@@ -43,7 +48,12 @@ const pascalCaseItem = {
   CustomerReviews: { StarRating: { Value: 4.3 }, Count: 217 },
   OffersV2: {
     Listings: [
-      { Price: { Money: { DisplayAmount: '￥3,059' }, SavingBasis: { Money: { DisplayAmount: '￥3,500' } } } },
+      {
+        Price: {
+          Money: { DisplayAmount: '￥3,059' },
+          SavingBasis: { Money: { DisplayAmount: '￥3,500' } },
+        },
+      },
     ],
   },
 }
@@ -59,7 +69,7 @@ describe('parseGetItemsResponse', () => {
       description: 'マグネシウムを配合したエナジージェル',
       rating: 4.3,
       reviewCount: 217,
-      detailPageUrl: 'https://www.amazon.co.jp/dp/B00TQMO5E0?tag=' + TAG,
+      detailPageUrl: `https://www.amazon.co.jp/dp/B00TQMO5E0?tag=${TAG}`,
       brand: 'Mag-on',
       model: 'MG-12',
       partNumber: 'MGP-001',

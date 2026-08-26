@@ -100,9 +100,7 @@ function renderRating(rating: number, reviewCount: number): string {
 
 function renderPrices(price?: string, listPrice?: string): string {
   if (!price && !listPrice) return ''
-  const current = price
-    ? `<span class="amazon-card__price">${escapeHtml(price)}</span>`
-    : ''
+  const current = price ? `<span class="amazon-card__price">${escapeHtml(price)}</span>` : ''
   const original =
     listPrice && listPrice !== price
       ? `<span class="amazon-card__list-price">${escapeHtml(listPrice)}</span>`
