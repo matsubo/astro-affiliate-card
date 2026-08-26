@@ -129,11 +129,14 @@ links in three sites' articles into cards. It becomes an opt-in flag.
 ## Environment contract
 
 ```
-AMAZON_AFFILIATE_TAG      affiliate tag for Amazon links
-AMAZON_CREATORS_*         Creators API credentials
-RAKUTEN_AFFILIATE_ID      omit to hide the Rakuten button
-YAHOO_VC_SID              omit to hide the Yahoo! button
-YAHOO_VC_PID              omit to hide the Yahoo! button
+AMAZON_AFFILIATE_TAG              affiliate tag for Amazon links
+AMAZON_CREATOR_CREDENTIAL_ID      Creators API credential
+AMAZON_CREATOR_SECRET             Creators API credential
+AMAZON_CREATOR_CREDENTIAL_VERSION optional, defaults to 3.3
+AMAZON_MARKETPLACE                optional, defaults to www.amazon.co.jp
+RAKUTEN_AFFILIATE_ID              omit to hide the Rakuten button
+YAHOO_VC_SID                      omit to hide the Yahoo! button
+YAHOO_VC_PID                      omit to hide the Yahoo! button
 ```
 
 A missing shop credential hides that button rather than rendering a broken
