@@ -100,3 +100,36 @@ describe('remarkAmazon — bare Amazon URLs', () => {
     expect(html).not.toContain('amazon-card')
   })
 })
+
+describe('remarkAmazon — shop search keyword', () => {
+  const creds = { rakutenAffiliateId: 'abc.123', yahooVcSid: '888', yahooVcPid: '999' }
+
+  test('searches the part number rather than the marketing title', () => {
+    const html = render('::amazon{asin="B0PART0001"}', {
+      credentials: creds,
+      products: {
+        B0PART0001: { title: '【保証3年】タックス スマートトレーナー NEO 2T 対応', partNumber: 'T2875.72' },
+      },
+    })
+    expect(html).toContain(encodeURIComponent('T2875.72'))
+  })
+
+  test('honours an explicit kw on the directive', () => {
+    const html = render('::amazon{asin="B00TQMO5E0" kw="メダリスト"}', { credentials: creds })
+    // Encoded twice: once into the search URL, then again as the pc= value.
+    expect(html).toContain(encodeURIComponent(encodeURIComponent('メダリスト')))
+  })
+
+  test('condenses a long title when nothing better identifies the product', () => {
+    const title =
+      '[ROCKBROS] 偏光サングラス 調光サングラス 交換可能レンズ2枚 スポーツサングラス UV400 紫外線カット 超軽量'
+    const html = render('::amazon{asin="B0LONG0001"}', {
+      credentials: creds,
+      products: { B0LONG0001: { title } },
+    })
+    const twice = (v: string) => encodeURIComponent(encodeURIComponent(v))
+    // The full title would over-specify the search into zero hits.
+    expect(html).not.toContain(twice(title))
+    expect(html).toContain(twice('[ROCKBROS]'))
+  })
+})

@@ -1,6 +1,6 @@
 {
   "name": "astro-affiliate-card",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Astro integration for Amazon / Rakuten / Yahoo! affiliate product cards",
   "keywords": [
     "astro",

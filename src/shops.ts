@@ -82,6 +82,51 @@ export function buildYahooBeaconUrl(
   return `https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=${sid}&pid=${pid}`
 }
 
+/**
+ * Condenses a keyword-stuffed Amazon title into something a shop search can
+ * actually match.
+ *
+ * Amazon titles read like "【PS5対応】メーカー保証3年 BRAND 商品名 対応 A B C…".
+ * Handed to Rakuten verbatim they over-specify the query into zero hits, so
+ * the button lands the reader on an empty results page. Marketing segments in
+ * 【】 go, and whole tokens are kept up to roughly 30 characters -- never
+ * splitting one, since half a token matches nothing.
+ */
+export function condenseTitleKeyword(title: string): string {
+  const tokens = title
+    .replace(/【[^】]*】/g, ' ')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+
+  let kept = tokens[0] ?? ''
+  for (const token of tokens.slice(1)) {
+    const candidate = `${kept} ${token}`
+    if (candidate.length > 30) break
+    kept = candidate
+  }
+  return kept
+}
+
+/**
+ * Picks what to search the other shops for.
+ *
+ * A part number or model is what actually identifies the product across
+ * retailers; the title is a marketing string and only a last resort. An
+ * explicit `kw` on the directive overrides all of it.
+ */
+export function deriveSearchKeyword({
+  kw,
+  product,
+  title,
+}: {
+  kw?: string | undefined
+  product?: { partNumber?: string | undefined; model?: string | undefined } | undefined
+  title?: string | undefined
+} = {}): string {
+  return kw || product?.partNumber || product?.model || (title ? condenseTitleKeyword(title) : '')
+}
+
 /** Builds every shop link a set of credentials allows for one search keyword. */
 export function resolveShopLinks(keyword: string, credentials: ShopCredentials): ShopLinks {
   return {

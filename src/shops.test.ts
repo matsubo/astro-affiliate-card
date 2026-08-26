@@ -6,6 +6,7 @@ import {
   buildYahooSearchUrl,
   extractAsin,
   isAmazonUrl,
+  deriveSearchKeyword,
   resolveShopLinks,
 } from './shops.js'
 
@@ -108,5 +109,48 @@ describe('resolveShopLinks', () => {
     const links = resolveShopLinks('', creds)
     expect(links.rakutenUrl).toBeNull()
     expect(links.yahooUrl).toBeNull()
+  })
+})
+
+describe('deriveSearchKeyword', () => {
+  // Amazon titles are keyword-stuffed. Handed to Rakuten verbatim they
+  // over-specify the search into zero hits, so the shop buttons land on an
+  // empty results page -- which is worse than not showing them.
+  test('condenses a keyword-stuffed title to whole tokens under ~30 chars', () => {
+    const title = '【PS5対応】メーカー保証3年 ROCKBROS 偏光サングラス 交換可能レンズ2枚 UV400 紫外線カット'
+    const keyword = deriveSearchKeyword({ title })
+    // 【】 segments go; the rest is trimmed to whole tokens. It does not try to
+    // guess which token is the brand -- that is what partNumber/model are for.
+    expect(keyword).not.toContain('【')
+    expect(keyword).not.toContain('PS5対応')
+    expect(keyword.length).toBeLessThanOrEqual(30)
+    expect(keyword).toContain('ROCKBROS')
+  })
+
+  test('prefers a part number over the title', () => {
+    expect(deriveSearchKeyword({ title: '長い長い商品名', product: { partNumber: 'T2875.72' } })).toBe(
+      'T2875.72',
+    )
+  })
+
+  test('falls back to the model when there is no part number', () => {
+    expect(deriveSearchKeyword({ title: '長い長い商品名', product: { model: 'NEO 2T' } })).toBe('NEO 2T')
+  })
+
+  test('an explicit kw beats everything', () => {
+    expect(
+      deriveSearchKeyword({ kw: 'メダリスト ジェル', title: '長い商品名', product: { partNumber: 'X1' } }),
+    ).toBe('メダリスト ジェル')
+  })
+
+  test('yields nothing when there is nothing to search for', () => {
+    expect(deriveSearchKeyword({})).toBe('')
+  })
+
+  test('never splits a token in half', () => {
+    const keyword = deriveSearchKeyword({ title: 'ABCDEFGHIJ 0123456789 abcdefghij klmnop' })
+    for (const token of keyword.split(' ')) {
+      expect('ABCDEFGHIJ 0123456789 abcdefghij klmnop'.split(' ')).toContain(token)
+    }
   })
 })

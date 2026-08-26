@@ -12,7 +12,13 @@ import type { Plugin } from 'unified'
 import { visit } from 'unist-util-visit'
 import { renderAmazonCard, type AmazonCardData, type CardLabels } from './card.js'
 import { resolveOptions, type AffiliateCardOptions } from './options.js'
-import { extractAsin, isAmazonUrl, resolveShopLinks, type ShopCredentials } from './shops.js'
+import {
+  deriveSearchKeyword,
+  extractAsin,
+  isAmazonUrl,
+  resolveShopLinks,
+  type ShopCredentials,
+} from './shops.js'
 
 /** One entry of a site's amazon-products.json. */
 export interface ProductRecord {
@@ -25,6 +31,9 @@ export interface ProductRecord {
   reviewCount?: number
   detailPageUrl?: string
   brand?: string
+  /** Feeds the shop searches: identifies the product across retailers. */
+  partNumber?: string
+  model?: string
 }
 
 export interface RemarkAmazonOptions {
@@ -65,12 +74,13 @@ function toCardData(asin: string, product: ProductRecord | undefined, tag: strin
 export const remarkAmazon: Plugin<[RemarkAmazonOptions], Root> = (options) => {
   const { products, affiliateTag, credentials, labels, bareUrls = false } = options
 
-  const cardHtml = (asin: string): string => {
+  const cardHtml = (asin: string, kw?: string): string => {
     const product = products[asin]
     const data = toCardData(asin, product, affiliateTag)
-    // The shop searches use the product title; without one there is nothing to
-    // search for, and resolveShopLinks yields no buttons.
-    const links = resolveShopLinks(product?.title ?? '', credentials)
+    // A part number identifies the product across retailers; the title is a
+    // marketing string that over-specifies a shop search into zero hits.
+    const keyword = deriveSearchKeyword({ kw, product, title: product?.title })
+    const links = resolveShopLinks(keyword, credentials)
     return renderAmazonCard(data, links, labels)
   }
 
@@ -80,11 +90,14 @@ export const remarkAmazon: Plugin<[RemarkAmazonOptions], Root> = (options) => {
 
       if (node.type === 'leafDirective' && node.name === 'amazon') {
         const asin = node.attributes?.asin
+        // `kw` overrides the derived shop-search keyword, for products whose
+        // name searches badly on Rakuten or Yahoo!.
+        const kw = node.attributes?.kw ?? undefined
         // A directive with no ASIN has nothing to render; drop it rather than
         // letting it flatten into visible text.
         parent.children.splice(index, 1, {
           type: 'html',
-          value: asin ? cardHtml(asin) : '',
+          value: asin ? cardHtml(asin, kw) : '',
         })
         return
       }
