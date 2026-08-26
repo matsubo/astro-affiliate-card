@@ -140,6 +140,18 @@ describe('getItems — response', () => {
     expect(error.message).not.toContain('x'.repeat(301))
   })
 
+  // A body that cannot be read must not turn an HTTP error into an unrelated
+  // one; the status is the part worth reporting either way.
+  test('still reports the status when the error body cannot be read', async () => {
+    const broken = new Response('unreadable', { status: 503 })
+    Object.defineProperty(broken, 'text', {
+      value: () => Promise.reject(new Error('body already consumed')),
+    })
+    const fetchImpl = (async () => broken) as unknown as typeof fetch
+    const client = createClient(config(), { fetchImpl, tokenManager })
+    await expect(client.getItems(['B0'])).rejects.toThrow('getItems failed with HTTP 503')
+  })
+
   test('wraps a network failure with what was being attempted', async () => {
     const fetchImpl = (async () => {
       throw new Error('socket hang up')

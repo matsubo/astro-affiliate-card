@@ -2,7 +2,14 @@
   "name": "astro-affiliate-card",
   "version": "0.1.0",
   "description": "Astro integration for Amazon / Rakuten / Yahoo! affiliate product cards",
-  "keywords": ["astro", "astro-integration", "affiliate", "amazon", "rakuten", "yahoo"],
+  "keywords": [
+    "astro",
+    "astro-integration",
+    "affiliate",
+    "amazon",
+    "rakuten",
+    "yahoo"
+  ],
   "license": "MIT",
   "author": "matsubo",
   "repository": {
@@ -10,7 +17,9 @@
     "url": "git+https://github.com/matsubo/astro-affiliate-card.git"
   },
   "type": "module",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -34,8 +43,9 @@
     "affiliate-card": "./dist/bin/fetch.js"
   },
   "scripts": {
-    "build": "tsc && cp src/card.css dist/card.css",
+    "build": "rm -rf dist && tsc && cp src/card.css dist/card.css",
     "test": "bun test",
+    "test:coverage": "bun test --coverage",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "bun run test && bun run build"
   },
