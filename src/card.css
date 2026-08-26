@@ -1,0 +1,240 @@
+/*
+ * Styles for .amazon-card.
+ *
+ * Every colour, radius and font here resolves through an --aff-* custom
+ * property, so a site re-skins the card by overriding variables instead of
+ * forking the markup. The defaults are deliberately plain and work on a light
+ * or a dark page without configuration.
+ *
+ * Selectors are wrapped in :where() to keep specificity at zero, so a site's
+ * own rules always win without needing !important.
+ */
+
+.amazon-card {
+  --aff-bg: canvas;
+  --aff-fg: canvastext;
+  --aff-muted: color-mix(in oklab, currentcolor 60%, transparent);
+  --aff-border: color-mix(in oklab, currentcolor 20%, transparent);
+  --aff-accent: #0969da;
+  --aff-star: #f5a623;
+  --aff-price: #b12704;
+  --aff-radius: 0.5rem;
+  --aff-gap: 0.75rem;
+  --aff-media-size: 11.5rem;
+  --aff-font: inherit;
+  --aff-max-width: 44rem;
+
+  margin: 2rem auto;
+  max-width: var(--aff-max-width);
+  border: 1px solid var(--aff-border);
+  border-radius: var(--aff-radius);
+  background: var(--aff-bg);
+  color: var(--aff-fg);
+  font-family: var(--aff-font);
+  overflow: hidden;
+}
+
+:where(.amazon-card) a,
+:where(.amazon-card) a:hover {
+  text-decoration: none;
+  color: inherit;
+}
+
+:where(.amazon-card__link) {
+  display: flex;
+  align-items: stretch;
+}
+
+/* Product shots are supplied on white, so the media well stays white in both
+   themes rather than leaving the cut-out floating on a dark panel. */
+:where(.amazon-card__media) {
+  flex: 0 0 var(--aff-media-size);
+  min-height: var(--aff-media-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.875rem;
+  background: #fff;
+  border-right: 1px solid var(--aff-border);
+}
+
+:where(.amazon-card__media) img {
+  width: 100%;
+  height: 100%;
+  max-height: 13rem;
+  object-fit: contain;
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+:where(.amazon-card__media--empty) {
+  background: color-mix(in oklab, var(--aff-fg) 6%, transparent);
+  color: var(--aff-muted);
+}
+
+:where(.amazon-card__body) {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--aff-gap);
+  padding: 1.125rem 1.375rem;
+}
+
+:where(.amazon-card__kicker) {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  color: var(--aff-muted);
+}
+
+:where(.amazon-card__kicker-tag) {
+  padding: 0.1rem 0.4rem;
+  border: 1px solid var(--aff-border);
+  border-radius: 0.2rem;
+}
+
+:where(.amazon-card__title) {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+:where(.amazon-card__rating) {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8125rem;
+}
+
+:where(.amazon-card__star--filled) {
+  color: var(--aff-star);
+}
+
+:where(.amazon-card__star--empty) {
+  color: var(--aff-border);
+}
+
+:where(.amazon-card__rating-value) {
+  color: var(--aff-muted);
+}
+
+:where(.amazon-card__description) {
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--aff-muted);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+}
+
+:where(.amazon-card__readout) {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+:where(.amazon-card__price) {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--aff-price);
+}
+
+:where(.amazon-card__list-price) {
+  font-size: 0.8125rem;
+  color: var(--aff-muted);
+  text-decoration: line-through;
+}
+
+:where(.amazon-card__cta) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: auto;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--aff-accent);
+}
+
+:where(.amazon-card__shops) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.375rem;
+  border-top: 1px solid var(--aff-border);
+}
+
+:where(.amazon-card__shops-label) {
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  color: var(--aff-muted);
+}
+
+:where(.amazon-card__shop) {
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--aff-border);
+  border-radius: 0.25rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+:where(.amazon-card__shop--rakuten) {
+  color: #bf0000;
+}
+
+:where(.amazon-card__shop--yahoo) {
+  color: #ff0033;
+}
+
+/* The ValueCommerce impression beacon must be fetched, so it cannot be
+   display:none — it is collapsed to a pixel instead. */
+:where(.amazon-card__vc-beacon) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 34rem) {
+  :where(.amazon-card__link) {
+    flex-direction: column;
+  }
+
+  :where(.amazon-card__media) {
+    flex-basis: auto;
+    min-height: 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--aff-border);
+  }
+
+  :where(.amazon-card__media) img {
+    max-height: 10rem;
+  }
+}
+
+@media (hover: hover) {
+  .amazon-card {
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .amazon-card:hover {
+    border-color: color-mix(in oklab, var(--aff-accent) 45%, var(--aff-border));
+    box-shadow: 0 10px 30px -18px color-mix(in oklab, var(--aff-accent) 60%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .amazon-card {
+    transition: none;
+  }
+}
