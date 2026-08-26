@@ -124,22 +124,20 @@ describe('affiliateCard integration', () => {
     expect(warnings.some((message) => message.includes('cards will use plain links'))).toBe(true)
   })
 
-  // Astro 7's default Markdown processor runs no remark plugins, so sites
-  // that need them declare `markdown.processor` and list plugins themselves.
-  // This integration cannot reach that list, and the failure mode is silent --
-  // every ::amazon renders as literal text. Three of the four sites this
-  // package serves are in exactly that shape, and one of them shipped a build
-  // with no cards at all before anyone noticed.
-  test('refuses to register silently when markdown.processor is declared', () => {
-    const { warnings } = runSetup(root, {}, { processor: {} })
+  // Astro populates markdown.processor with its own default whether or not the
+  // site declared one, so the integration must not treat its presence as a
+  // reason to skip registration -- doing so removed every card from a site
+  // that had never declared a processor at all.
+  test('registers the plugin even when markdown.processor is present', () => {
+    const { remarkOptions, warnings } = runSetup(root, {}, { processor: {} })
 
-    expect(warnings.some((m) => m.includes('markdown.processor is declared explicitly'))).toBe(true)
-    expect(warnings.some((m) => m.includes('createRemarkAmazon'))).toBe(true)
+    expect(remarkOptions.products).toHaveProperty('B00TQMO5E0')
+    expect(warnings.some((m) => m.includes('cannot register'))).toBe(false)
   })
 
-  test('still injects the stylesheet when it cannot register the plugin', () => {
-    const { injected } = runSetup(root, {}, { processor: {} })
-    expect(injected.some((entry) => entry.includes('card.css'))).toBe(true)
+  test('points at createRemarkAmazon for sites that declare their own processor', () => {
+    const { infos } = runSetup(root, {}, { processor: {} })
+    expect(infos.some((m) => m.includes('createRemarkAmazon'))).toBe(true)
   })
 
   test('survives a data file that is not valid JSON', () => {

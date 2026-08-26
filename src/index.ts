@@ -37,22 +37,20 @@ export default function affiliateCard(options: IntegrationOptions = {}): AstroIn
           injectScript('page-ssr', `import 'astro-affiliate-card/card.css';`)
         }
 
-        // Astro 7's default Markdown processor does not run remark/rehype
-        // plugins, so a site that needs them declares `markdown.processor` and
-        // lists the plugins itself. Nothing this integration adds to
-        // `markdown.remarkPlugins` reaches that list -- and the failure is
-        // silent: the directive just renders as literal text. Say so rather
-        // than letting every card quietly disappear.
-        if ((config.markdown as { processor?: unknown } | undefined)?.processor) {
-          logger.warn(
-            'markdown.processor is declared explicitly, so this integration cannot register its ' +
-              'remark plugin and ::amazon directives will render as text. Add the plugin to that ' +
-              'processor instead:\n' +
-              "  import { createRemarkAmazon } from 'astro-affiliate-card/remark'\n" +
-              '  remarkPlugins: [remarkDirective, createRemarkAmazon(), ...]',
-          )
-          return
-        }
+        // A site whose Markdown is built out of remark plugins declares
+        // `markdown.processor: unified({...})` and lists them itself, because
+        // Astro 7's native processor runs none. An integration cannot add to a
+        // list the site constructs, and the failure is silent: every ::amazon
+        // renders as literal text.
+        //
+        // There is no reliable way to tell that apart from here -- Astro
+        // populates `markdown.processor` with its own default either way, so
+        // testing that field flags every site. Register regardless (harmless
+        // when it goes unused) and say what to do if the cards do not appear.
+        logger.info(
+          'if this site declares markdown.processor, add the plugin to it instead: ' +
+            "import { createRemarkAmazon } from 'astro-affiliate-card/remark'",
+        )
 
         updateConfig({
           markdown: {
