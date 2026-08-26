@@ -58,9 +58,13 @@ peer range claims. Action versions are pinned by SHA.
 
 - **Keep the peer range as wide as the code actually supports.** The only Astro
   import is `type { AstroIntegration }`; the hook uses `config.root`,
-  `updateConfig`, `injectScript` and `logger`. Before narrowing or widening
-  `peerDependencies`, typecheck against the floor of each major rather than
-  guessing — the `astro-peer-range` CI job does exactly this.
+  `updateConfig`, `injectScript` and `logger` — all stable since Astro 3, none
+  of it touched by a major. So the range is `>=4.0.0`, with no upper bound: a
+  new Astro major is supported the day it ships, without a release here.
+  The `astro-peer-range` CI job typechecks the floor, every major since, and
+  `latest`, weekly as well as on every push — that job going red is the signal
+  to add an upper bound, not a reason to have had one all along. Astro 2 is the
+  first that genuinely fails (no `logger` on the hook, no `config.root`).
 - `remark-directive` is an optional peer, not a dependency: it parses
   `::amazon`, Astro does not enable it, and a site using only `bareUrls` never
   parses a directive at all.
