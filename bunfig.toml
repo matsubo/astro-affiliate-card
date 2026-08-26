@@ -4,8 +4,9 @@ coverageSkipTestFiles = true
 coverageReporter = ["text", "lcov"]
 coverageDir = "coverage"
 
-# Well above the 80% floor, with room for a new branch to land uncovered
+# Well above the 80% floor, with headroom for a new branch to land uncovered
 # before it blocks. Raise to 1 to ratchet the current state in place.
-[test.coverageThreshold]
-line = 0.9
-function = 0.9
+#
+# The keys are plural: bun silently ignores `line` / `function`, so a typo here
+# reads as a passing build rather than as a broken threshold.
+coverageThreshold = { lines = 0.9, functions = 0.9 }
