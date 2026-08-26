@@ -32,7 +32,11 @@ interface Setup {
 }
 
 /** Runs the astro:config:setup hook against fakes and reports what it did. */
-function runSetup(root: string, options: AffiliateCardOptions = {}): Setup {
+function runSetup(
+  root: string,
+  options: AffiliateCardOptions = {},
+  markdown: Record<string, unknown> = {},
+): Setup {
   const injected: string[] = []
   const warnings: string[] = []
   const infos: string[] = []
@@ -45,7 +49,7 @@ function runSetup(root: string, options: AffiliateCardOptions = {}): Setup {
   try {
     const hook = affiliateCard(options).hooks['astro:config:setup']!
     hook({
-      config: { root: pathToFileURL(`${root}/`) },
+      config: { root: pathToFileURL(`${root}/`), markdown },
       updateConfig: (update: { markdown: { remarkPlugins: [unknown, RemarkAmazonOptions][] } }) => {
         remarkOptions = update.markdown.remarkPlugins[0]![1]
       },
@@ -111,12 +115,31 @@ describe('affiliateCard integration', () => {
   // failing a site's build over a file that has not been generated yet.
   test('warns but does not fail the build when the data file is missing', () => {
     rmSync(join(root, 'src/data/amazon-products.json'))
-    const { remarkOptions, consoleWarnings } = runSetup(root)
+    const { remarkOptions, warnings } = runSetup(root)
 
     expect(remarkOptions.products).toEqual({})
-    expect(consoleWarnings.some((message) => message.includes('cards will use plain links'))).toBe(
-      true,
-    )
+    // Reported through Astro's logger rather than console.warn, so it is
+    // prefixed and obeys the build's log level like every other integration
+    // message.
+    expect(warnings.some((message) => message.includes('cards will use plain links'))).toBe(true)
+  })
+
+  // Astro 7's default Markdown processor runs no remark plugins, so sites
+  // that need them declare `markdown.processor` and list plugins themselves.
+  // This integration cannot reach that list, and the failure mode is silent --
+  // every ::amazon renders as literal text. Three of the four sites this
+  // package serves are in exactly that shape, and one of them shipped a build
+  // with no cards at all before anyone noticed.
+  test('refuses to register silently when markdown.processor is declared', () => {
+    const { warnings } = runSetup(root, {}, { processor: {} })
+
+    expect(warnings.some((m) => m.includes('markdown.processor is declared explicitly'))).toBe(true)
+    expect(warnings.some((m) => m.includes('createRemarkAmazon'))).toBe(true)
+  })
+
+  test('still injects the stylesheet when it cannot register the plugin', () => {
+    const { injected } = runSetup(root, {}, { processor: {} })
+    expect(injected.some((entry) => entry.includes('card.css'))).toBe(true)
   })
 
   test('survives a data file that is not valid JSON', () => {

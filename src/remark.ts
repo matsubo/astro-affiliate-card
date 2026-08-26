@@ -11,6 +11,7 @@ import type {} from 'mdast-util-directive'
 import type { Plugin } from 'unified'
 import { visit } from 'unist-util-visit'
 import { renderAmazonCard, type AmazonCardData, type CardLabels } from './card.js'
+import { resolveOptions, type AffiliateCardOptions } from './options.js'
 import { extractAsin, isAmazonUrl, resolveShopLinks, type ShopCredentials } from './shops.js'
 
 /** One entry of a site's amazon-products.json. */
@@ -101,6 +102,30 @@ export const remarkAmazon: Plugin<[RemarkAmazonOptions], Root> = (options) => {
       parent.children.splice(index, 1, { type: 'html', value: cardHtml(asin) })
     })
   }
+}
+
+/**
+ * A remark plugin ready to drop into an explicitly declared processor.
+ *
+ * Astro 7's default Markdown processor does not run remark/rehype plugins, so
+ * a site that needs them declares `markdown.processor: unified({...})` and
+ * lists the plugins itself. An integration cannot reach that list, so those
+ * sites call this instead of, or alongside, the integration.
+ *
+ * Place it after remark-directive (which parses `::amazon`) and before any
+ * plugin that flattens unhandled directives.
+ *
+ * ```js
+ * import { createRemarkAmazon } from 'astro-affiliate-card/remark'
+ *
+ * processor: unified({
+ *   remarkPlugins: [remarkDirective, createRemarkAmazon(), parseDirectiveNode],
+ * })
+ * ```
+ */
+export function createRemarkAmazon(options: AffiliateCardOptions = {}) {
+  const resolved = resolveOptions(options)
+  return [remarkAmazon, resolved] as const
 }
 
 export default remarkAmazon
