@@ -107,7 +107,13 @@ async function main(): Promise<void> {
   const result = await syncProducts({
     asins,
     existing,
-    client: createClient(config, { tokenManager: createTokenManager(config) }),
+    client: createClient(config, {
+      tokenManager: createTokenManager(config),
+      retry: {
+        onRetry: ({ status, waitMs }) =>
+          console.log(`  rate limited (HTTP ${status}); retrying in ${waitMs / 1000}s`),
+      },
+    }),
     partnerTag: config.partnerTag,
     force: options.force,
     log: (message) => console.log(message),

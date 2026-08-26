@@ -134,7 +134,8 @@ describe('getItems — response', () => {
   test('truncates a long error body', async () => {
     const fetchImpl = (async () =>
       new Response('x'.repeat(5000), { status: 500 })) as unknown as typeof fetch
-    const client = createClient(config(), { fetchImpl, tokenManager })
+    // One attempt: this checks the error text, not the retry behaviour.
+    const client = createClient(config(), { fetchImpl, tokenManager, retry: { attempts: 1 } })
     const error = (await client.getItems(['B0']).catch((e: Error) => e)) as Error
     expect(error.message).toContain('x'.repeat(300))
     expect(error.message).not.toContain('x'.repeat(301))
@@ -148,7 +149,8 @@ describe('getItems — response', () => {
       value: () => Promise.reject(new Error('body already consumed')),
     })
     const fetchImpl = (async () => broken) as unknown as typeof fetch
-    const client = createClient(config(), { fetchImpl, tokenManager })
+    // One attempt: this checks the error text, not the retry behaviour.
+    const client = createClient(config(), { fetchImpl, tokenManager, retry: { attempts: 1 } })
     await expect(client.getItems(['B0'])).rejects.toThrow('getItems failed with HTTP 503')
   })
 
