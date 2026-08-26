@@ -94,8 +94,18 @@ Everything that reads as site voice becomes an option with a neutral Japanese
 default: the kicker, the shop-section label, and the CTA text. `impreza-gdb`
 passes its own strings at migration time to keep its current wording.
 
-The `PR` kicker stays on by default. It is the ステマ規制 disclosure, not
-decoration, and a site should have to opt out deliberately.
+The kicker carries the **brand** rather than a disclosure. `PR` was the
+default at first, on the reasoning that ステマ規制 makes it a requirement rather
+than decoration; the author's call was to take it off the card, since a site
+can disclose once per article instead. It remains available as
+`labels: { kicker: 'PR' }`, and the README says so.
+
+The ASIN and the description are off by default too. The ASIN identifies the
+product to Amazon, not to a reader, and Amazon's description is the same
+keyword-stuffed copy as the title.
+
+The card renders no star rating: probing the API showed `customerReviews`
+comes back null, so the rating inherited from impreza-gdb could never appear.
 
 The stylesheet drives colours, fonts, radii and spacing from custom
 properties, so a site re-skins the card by overriding variables rather than
@@ -148,13 +158,22 @@ real tag. That dead read goes away with the migration.
 
 Fewest cards first, so a mistake is cheapest where it is most likely:
 
-1. **impreza-gdb** (51 cards) — the pilot, consumed via `file:` link before
-   anything is published. Doubles as the end-to-end test of the sync CLI,
-   since it generates its first `amazon-products.json`.
-2. Publish to npm. This is a user action; the account is not currently
-   logged in.
-3. **blog** (242) → **triathlon** (432) → **zc33s** (726), pinned to the
+Planned as fewest-cards-first, but the author chose **triathlon** as the pilot
+so the package could be proven on the site being worked on.
+
+1. **triathlon** (432 cards) — piloted via a `file:` link. Verified against a
+   pre-migration baseline: 432 tagged links and 263 unique ASINs, unchanged,
+   plus 1,037 Rakuten and Yahoo! buttons that did not exist before. The sync
+   CLI ran end-to-end against real credentials: 261 ASINs in, 261 out, nothing
+   dropped.
+2. Publish to npm.
+3. **impreza-gdb** (51) → **blog** (242) → **zc33s** (726), pinned to the
    published version.
+
+Two things the pilot taught, both now handled: a host site's own `a` rules can
+outrank the package stylesheet, which is what `linkClass` exists for; and
+Astro caches rendered content, so a plugin change needs `astro build --force`
+to take effect.
 
 Per repository: drop the `amazon:` entry from the rehype components map
 (keeping `remark-directive`), delete the old renderer and `amazon-creators`
