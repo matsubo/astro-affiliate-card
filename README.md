@@ -31,6 +31,33 @@ export default defineConfig({
 The integration registers the remark plugin and injects the stylesheet. Nothing
 else to wire up.
 
+### Sites that declare `markdown.processor`
+
+Astro 7's native Markdown processor runs no remark or rehype plugins, so a site
+whose Markdown depends on them declares the unified processor itself:
+
+```js
+import { createRemarkAmazon } from 'astro-affiliate-card/remark'
+
+markdown: {
+  processor: unified({
+    remarkPlugins: [remarkDirective, createRemarkAmazon(), /* … */],
+  }),
+}
+```
+
+An integration cannot add to a list the site constructs, so `affiliateCard()`
+does nothing useful there — the directives render as literal text, with no
+error.
+
+**Import the stylesheet yourself in this case.** `createRemarkAmazon()` is a
+remark plugin; only the integration can inject CSS. Without this the cards
+render unstyled:
+
+```css
+@import "astro-affiliate-card/card.css";
+```
+
 ## Configure
 
 ```js
