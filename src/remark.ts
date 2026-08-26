@@ -10,8 +10,8 @@ import type { Root } from 'mdast'
 import type {} from 'mdast-util-directive'
 import type { Plugin } from 'unified'
 import { visit } from 'unist-util-visit'
-import { renderAmazonCard, type AmazonCardData, type CardLabels } from './card'
-import { extractAsin, isAmazonUrl, resolveShopLinks, type ShopCredentials } from './shops'
+import { renderAmazonCard, type AmazonCardData, type CardLabels } from './card.js'
+import { extractAsin, isAmazonUrl, resolveShopLinks, type ShopCredentials } from './shops.js'
 
 /** One entry of a site's amazon-products.json. */
 export interface ProductRecord {

@@ -7,7 +7,7 @@ import {
   extractAsin,
   isAmazonUrl,
   resolveShopLinks,
-} from './shops'
+} from './shops.js'
 
 describe('extractAsin', () => {
   test('extracts the ASIN from /dp/ URLs', () => {

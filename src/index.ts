@@ -5,14 +5,14 @@ import { readFileSync } from 'node:fs'
 import { isAbsolute, join } from 'node:path'
 import type { AstroIntegration } from 'astro'
 import { loadEnv } from 'vite'
-import type { CardLabels } from './card'
-import { remarkAmazon, type ProductRecord } from './remark'
-import type { ShopCredentials } from './shops'
+import type { CardLabels } from './card.js'
+import { remarkAmazon, type ProductRecord } from './remark.js'
+import type { ShopCredentials } from './shops.js'
 
-export type { AmazonCardData, CardLabels } from './card'
-export { renderAmazonCard } from './card'
-export { remarkAmazon, type ProductRecord, type RemarkAmazonOptions } from './remark'
-export * from './shops'
+export type { AmazonCardData, CardLabels } from './card.js'
+export { renderAmazonCard } from './card.js'
+export { remarkAmazon, type ProductRecord, type RemarkAmazonOptions } from './remark.js'
+export * from './shops.js'
 
 export interface AffiliateCardOptions {
   /**

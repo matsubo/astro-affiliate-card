@@ -5,8 +5,8 @@
 // and wording here are neutral, and a site restores its own voice through
 // CardLabels rather than by forking this file.
 
-import type { ShopLinks } from './shops'
-import { extractAsin } from './shops'
+import type { ShopLinks } from './shops.js'
+import { extractAsin } from './shops.js'
 
 export interface AmazonCardData {
   /** Destination of the main link — the Creators API detail URL when known. */
@@ -37,6 +37,15 @@ export interface CardLabels {
   showAsin?: boolean
   /** Extra class on the card root, for a site's own skin. */
   frameClass?: string
+  /**
+   * Extra class placed on every anchor the card renders.
+   *
+   * Sites often style every `<a>` inside prose. triathlon, for instance, has
+   * `.custom-md a:not(.no-styling)` forcing display and colour, which outranks
+   * this package's own class selectors. Passing that site's escape-hatch class
+   * here is cleaner than escalating specificity in the shipped stylesheet.
+   */
+  linkClass?: string
 }
 
 const DEFAULT_LABELS = {
@@ -45,6 +54,7 @@ const DEFAULT_LABELS = {
   cta: 'Amazonで見る',
   showAsin: true,
   frameClass: '',
+  linkClass: '',
 } as const satisfies Required<CardLabels>
 
 function escapeHtml(text: string): string {
@@ -86,12 +96,14 @@ function renderPrices(price?: string, listPrice?: string): string {
   return `<span class="amazon-card__readout">${current}${original}</span>`
 }
 
-function renderShops(links: ShopLinks, shopsLabel: string): string {
+function renderShops(links: ShopLinks, shopsLabel: string, linkClass: string): string {
+  const anchorClass = (modifier: string) =>
+    ['amazon-card__shop', modifier, linkClass].filter(Boolean).join(' ')
   const buttons: string[] = []
 
   if (links.rakutenUrl) {
     buttons.push(
-      `<a class="amazon-card__shop amazon-card__shop--rakuten" href="${escapeHtml(links.rakutenUrl)}" target="_blank" ${OUTBOUND_REL}>楽天で探す</a>`,
+      `<a class="${anchorClass('amazon-card__shop--rakuten')}" href="${escapeHtml(links.rakutenUrl)}" target="_blank" ${OUTBOUND_REL}>楽天で探す</a>`,
     )
   }
 
@@ -102,7 +114,7 @@ function renderShops(links: ShopLinks, shopsLabel: string): string {
       ? `<img src="${escapeHtml(links.yahooBeaconUrl)}" width="1" height="1" alt="" class="amazon-card__vc-beacon" />`
       : ''
     buttons.push(
-      `<a class="amazon-card__shop amazon-card__shop--yahoo" href="${escapeHtml(links.yahooUrl)}" target="_blank" ${OUTBOUND_REL}>${beacon}Yahoo!で探す</a>`,
+      `<a class="${anchorClass('amazon-card__shop--yahoo')}" href="${escapeHtml(links.yahooUrl)}" target="_blank" ${OUTBOUND_REL}>${beacon}Yahoo!で探す</a>`,
     )
   }
 
@@ -115,7 +127,10 @@ export function renderAmazonCard(
   shops: ShopLinks,
   labels: CardLabels = {},
 ): string {
-  const { kicker, shopsLabel, cta, showAsin, frameClass } = { ...DEFAULT_LABELS, ...labels }
+  const { kicker, shopsLabel, cta, showAsin, frameClass, linkClass } = {
+    ...DEFAULT_LABELS,
+    ...labels,
+  }
 
   const safeTitle = escapeHtml(data.title || 'Amazon商品リンク')
   const asin = data.asin ?? extractAsin(data.url)
@@ -134,7 +149,7 @@ export function renderAmazonCard(
   const rootClass = ['amazon-card', frameClass].filter(Boolean).join(' ')
 
   return `<div class="${rootClass}">
-  <a class="amazon-card__link" href="${escapeHtml(data.url)}" target="_blank" ${OUTBOUND_REL}>
+  <a class="${['amazon-card__link', linkClass].filter(Boolean).join(' ')}" href="${escapeHtml(data.url)}" target="_blank" ${OUTBOUND_REL}>
     ${media}
     <span class="amazon-card__body">
       <span class="amazon-card__kicker"><span class="amazon-card__kicker-tag">${escapeHtml(kicker)}</span>${asinTag}</span>
@@ -145,6 +160,6 @@ export function renderAmazonCard(
       <span class="amazon-card__cta"><span class="amazon-card__cta-text">${escapeHtml(cta)}</span>${ARROW_SVG}</span>
     </span>
   </a>
-  ${renderShops(shops, shopsLabel)}
+  ${renderShops(shops, shopsLabel, linkClass)}
 </div>`
 }

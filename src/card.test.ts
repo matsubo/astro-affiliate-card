@@ -1,6 +1,6 @@
 /// <reference types="bun" />
 import { describe, expect, test } from 'bun:test'
-import { renderAmazonCard } from './card'
+import { renderAmazonCard } from './card.js'
 
 const product = {
   url: 'https://www.amazon.co.jp/dp/B00TQMO5E0?tag=triathlon01-22',
@@ -87,6 +87,19 @@ describe('renderAmazonCard — disclosure and wording', () => {
     expect(html).toContain('// PARTS REGISTRY')
     expect(html).toContain('Amazonで詳細を見る')
     expect(html).toContain('hud-frame')
+  })
+
+  // A site whose own stylesheet claims every <a> needs a way to opt this card
+  // out. triathlon does exactly that with `.custom-md a:not(.no-styling)`.
+  test('puts a site escape-hatch class on every anchor it renders', () => {
+    const html = renderAmazonCard(
+      product,
+      { rakutenUrl: 'https://hb.afl.rakuten.co.jp/x' },
+      { linkClass: 'no-styling' },
+    )
+    const anchors = html.match(/<a class="[^"]*"/g) ?? []
+    expect(anchors.length).toBeGreaterThan(1)
+    for (const a of anchors) expect(a).toContain('no-styling')
   })
 
   test('can hide the ASIN readout', () => {

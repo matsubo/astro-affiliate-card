@@ -6,8 +6,10 @@
  * forking the markup. The defaults are deliberately plain and work on a light
  * or a dark page without configuration.
  *
- * Selectors are wrapped in :where() to keep specificity at zero, so a site's
- * own rules always win without needing !important.
+ * Selectors are plain classes rather than :where(): at zero specificity the
+ * card lost to ordinary site rules such as `.markdown a`, which stacked the
+ * layout and painted the title in the site's link colour. A single class still
+ * lets a site override any of this by naming the same class.
  */
 
 .amazon-card {
@@ -34,20 +36,23 @@
   overflow: hidden;
 }
 
-:where(.amazon-card) a,
-:where(.amazon-card) a:hover {
+.amazon-card a,
+.amazon-card a:hover {
   text-decoration: none;
-  color: inherit;
 }
 
-:where(.amazon-card__link) {
+/* Colour is set per anchor rather than blanket-inherited: a blanket
+   `.amazon-card a { color: inherit }` outranks the single-class shop rules
+   below and flattened their brand colours. */
+.amazon-card__link {
   display: flex;
   align-items: stretch;
+  color: var(--aff-fg);
 }
 
 /* Product shots are supplied on white, so the media well stays white in both
    themes rather than leaving the cut-out floating on a dark panel. */
-:where(.amazon-card__media) {
+.amazon-card__media {
   flex: 0 0 var(--aff-media-size);
   min-height: var(--aff-media-size);
   display: flex;
@@ -58,7 +63,7 @@
   border-right: 1px solid var(--aff-border);
 }
 
-:where(.amazon-card__media) img {
+.amazon-card__media img {
   width: 100%;
   height: 100%;
   max-height: 13rem;
@@ -68,12 +73,12 @@
   box-shadow: none;
 }
 
-:where(.amazon-card__media--empty) {
+.amazon-card__media--empty {
   background: color-mix(in oklab, var(--aff-fg) 6%, transparent);
   color: var(--aff-muted);
 }
 
-:where(.amazon-card__body) {
+.amazon-card__body {
   flex: 1;
   min-width: 0;
   display: flex;
@@ -82,7 +87,7 @@
   padding: 1.125rem 1.375rem;
 }
 
-:where(.amazon-card__kicker) {
+.amazon-card__kicker {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -91,42 +96,43 @@
   color: var(--aff-muted);
 }
 
-:where(.amazon-card__kicker-tag) {
+.amazon-card__kicker-tag {
   padding: 0.1rem 0.4rem;
   border: 1px solid var(--aff-border);
   border-radius: 0.2rem;
 }
 
-:where(.amazon-card__title) {
+.amazon-card__title {
+  color: var(--aff-fg);
   font-size: 1rem;
   font-weight: 700;
   line-height: 1.45;
   overflow-wrap: anywhere;
 }
 
-:where(.amazon-card__rating) {
+.amazon-card__rating {
   display: flex;
   align-items: center;
   gap: 0.4rem;
   font-size: 0.8125rem;
 }
 
-:where(.amazon-card__star--filled) {
+.amazon-card__star--filled {
   color: var(--aff-star);
 }
 
-:where(.amazon-card__star--empty) {
+.amazon-card__star--empty {
   color: var(--aff-border);
 }
 
-:where(.amazon-card__rating-value) {
+.amazon-card__rating-value {
   color: var(--aff-muted);
 }
 
-:where(.amazon-card__description) {
+.amazon-card__description {
+  color: var(--aff-muted);
   font-size: 0.8125rem;
   line-height: 1.6;
-  color: var(--aff-muted);
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
@@ -134,25 +140,25 @@
   overflow: hidden;
 }
 
-:where(.amazon-card__readout) {
+.amazon-card__readout {
   display: flex;
   align-items: baseline;
   gap: 0.5rem;
 }
 
-:where(.amazon-card__price) {
+.amazon-card__price {
   font-size: 1.125rem;
   font-weight: 700;
   color: var(--aff-price);
 }
 
-:where(.amazon-card__list-price) {
+.amazon-card__list-price {
   font-size: 0.8125rem;
   color: var(--aff-muted);
   text-decoration: line-through;
 }
 
-:where(.amazon-card__cta) {
+.amazon-card__cta {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
@@ -162,7 +168,7 @@
   color: var(--aff-accent);
 }
 
-:where(.amazon-card__shops) {
+.amazon-card__shops {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -171,13 +177,13 @@
   border-top: 1px solid var(--aff-border);
 }
 
-:where(.amazon-card__shops-label) {
+.amazon-card__shops-label {
   font-size: 0.6875rem;
   letter-spacing: 0.08em;
   color: var(--aff-muted);
 }
 
-:where(.amazon-card__shop) {
+.amazon-card__shop {
   padding: 0.3rem 0.7rem;
   border: 1px solid var(--aff-border);
   border-radius: 0.25rem;
@@ -185,17 +191,17 @@
   font-weight: 600;
 }
 
-:where(.amazon-card__shop--rakuten) {
+.amazon-card__shop--rakuten {
   color: #bf0000;
 }
 
-:where(.amazon-card__shop--yahoo) {
+.amazon-card__shop--yahoo {
   color: #ff0033;
 }
 
 /* The ValueCommerce impression beacon must be fetched, so it cannot be
    display:none — it is collapsed to a pixel instead. */
-:where(.amazon-card__vc-beacon) {
+.amazon-card__vc-beacon {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -206,18 +212,18 @@
 }
 
 @media (max-width: 34rem) {
-  :where(.amazon-card__link) {
+  .amazon-card__link {
     flex-direction: column;
   }
 
-  :where(.amazon-card__media) {
+  .amazon-card__media {
     flex-basis: auto;
     min-height: 0;
     border-right: 0;
     border-bottom: 1px solid var(--aff-border);
   }
 
-  :where(.amazon-card__media) img {
+  .amazon-card__media img {
     max-height: 10rem;
   }
 }
