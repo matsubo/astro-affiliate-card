@@ -13,8 +13,8 @@
  */
 
 .amazon-card {
-  --aff-bg: canvas;
-  --aff-fg: canvastext;
+  --aff-bg: #ffffff;
+  --aff-fg: #1f2328;
   --aff-muted: color-mix(in oklab, currentcolor 60%, transparent);
   --aff-border: color-mix(in oklab, currentcolor 20%, transparent);
   --aff-accent: #0969da;
@@ -209,6 +209,49 @@
   border: 0;
   opacity: 0;
   pointer-events: none;
+}
+
+/*
+ * Dark mode follows the host page's own marker rather than
+ * prefers-color-scheme.
+ *
+ * All four sites resolve their "auto" setting in JavaScript and stamp the
+ * result on <html>, so that marker is the single source of truth. A media
+ * query here would fight it: a reader on a dark OS who had explicitly chosen
+ * light would get a dark card on a light page.
+ *
+ * Only the variables change -- every rule above is shared.
+ */
+:root.dark .amazon-card,
+:root[data-theme='dark'] .amazon-card,
+.amazon-card--dark {
+  --aff-bg: #161b22;
+  --aff-fg: #e6edf3;
+  /* Lighter than the light-mode values: #0969da and #b12704 both fail
+     contrast against a dark panel. */
+  --aff-accent: #4493f8;
+  --aff-price: #ff8a80;
+}
+
+/* Product shots are cut out on white, so the media well stays light in dark
+   mode too -- a transparent PNG on a dark panel loses its edges. It is dimmed
+   rather than pure white so it does not glare beside dark text. */
+:root.dark .amazon-card__media,
+:root[data-theme='dark'] .amazon-card__media,
+.amazon-card--dark .amazon-card__media {
+  background: #e9edf1;
+}
+
+:root.dark .amazon-card__shop--rakuten,
+:root[data-theme='dark'] .amazon-card__shop--rakuten,
+.amazon-card--dark .amazon-card__shop--rakuten {
+  color: #ff6b6b;
+}
+
+:root.dark .amazon-card__shop--yahoo,
+:root[data-theme='dark'] .amazon-card__shop--yahoo,
+.amazon-card--dark .amazon-card__shop--yahoo {
+  color: #ff7591;
 }
 
 @media (max-width: 34rem) {
