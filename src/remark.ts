@@ -5,6 +5,9 @@
 // it into literal text.
 
 import type { Root } from 'mdast'
+// Registers the directive node types (leafDirective and friends) onto mdast.
+// Without this the visitor below has no 'leafDirective' case to narrow to.
+import type {} from 'mdast-util-directive'
 import type { Plugin } from 'unified'
 import { visit } from 'unist-util-visit'
 import { renderAmazonCard, type AmazonCardData, type CardLabels } from './card'
