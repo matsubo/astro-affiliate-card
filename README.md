@@ -1,5 +1,11 @@
 # astro-affiliate-card
 
+[![npm](https://img.shields.io/npm/v/astro-affiliate-card?logo=npm&color=cb3837)](https://www.npmjs.com/package/astro-affiliate-card)
+[![CI](https://github.com/matsubo/astro-affiliate-card/actions/workflows/ci.yml/badge.svg)](https://github.com/matsubo/astro-affiliate-card/actions/workflows/ci.yml)
+[![astro](https://img.shields.io/badge/astro-%3E%3D4-BC52EE?logo=astro&logoColor=white)](https://astro.build)
+[![downloads](https://img.shields.io/npm/dm/astro-affiliate-card?color=1f6feb)](https://www.npmjs.com/package/astro-affiliate-card)
+[![license](https://img.shields.io/npm/l/astro-affiliate-card?color=444)](./LICENSE)
+
 An Astro integration that renders Amazon product cards from a `::amazon`
 directive, with optional Rakuten and Yahoo! Shopping links alongside.
 
@@ -39,7 +45,7 @@ syntax on its own, and without it the directive reaches the page as literal
 text. Sites that only convert bare Amazon URLs (`bareUrls: true`) do not need
 it.
 
-Astro 4, 5, 6 and 7 are supported.
+Astro 4 and newer are supported.
 
 ### Sites that declare `markdown.processor`
 
