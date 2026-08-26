@@ -4,9 +4,9 @@ An Astro integration that renders Amazon product cards from a `::amazon`
 directive, with optional Rakuten and Yahoo! Shopping links alongside.
 
 ```markdown
-この記事で使ったジェルです。
+この記事で使ったウマです。
 
-::amazon{asin="B00TQMO5E0"}
+::amazon{asin="B003F5VYKW"}
 ```
 
 <img width="835" height="324" alt="image" src="https://github.com/user-attachments/assets/39ddfbda-8fc9-42f7-bbd1-3c4bebb0a2d8" />
