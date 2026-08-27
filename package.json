@@ -40,7 +40,7 @@
     "./card.css": "./dist/card.css"
   },
   "bin": {
-    "affiliate-card": "./dist/bin/fetch.js"
+    "affiliate-card": "dist/bin/fetch.js"
   },
   "scripts": {
     "build": "rm -rf dist && tsc && cp src/card.css dist/card.css",
