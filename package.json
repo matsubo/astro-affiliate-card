@@ -67,6 +67,9 @@
     "remark-directive": "^4.0.0"
   },
   "peerDependenciesMeta": {
+    "astro": {
+      "optional": true
+    },
     "remark-directive": {
       "optional": true
     }
