@@ -109,6 +109,32 @@ export function condenseTitleKeyword(title: string): string {
 }
 
 /**
+ * Whether a partNumber/model value looks like a retail model code worth
+ * searching a shop for.
+ *
+ * The Creators API also stuffs internal SKUs ("rtlsdr_only"), plain words
+ * ("illustrations"), brand names ("ホルツ") and variant phrases
+ * ("Flipside 300 (Black)") into those fields. Searching Rakuten for one of
+ * those lands on zero results, which is worse than the title fallback, so
+ * only values shaped like model codes get through.
+ */
+export function isSearchableModelCode(value: string | null | undefined): boolean {
+  if (!value) return false
+  const code = value.trim()
+  if (!code || code.length > 24) return false
+  // Underscores are SKU-speak; parentheses mark a colour or variant phrase.
+  if (code.includes('_') || /[()（）]/.test(code)) return false
+  // Real model codes are at most two tokens ("NW-E405 B"); more is a phrase.
+  if (code.split(/\s+/).length > 2) return false
+  // Non-ASCII values are brand or product words, not codes.
+  if (!/^[\x20-\x7e]+$/.test(code)) return false
+  // Without a digit it is usually a word; the exception is short dashed
+  // all-caps codes like "TJB-SPT".
+  if (!/\d/.test(code)) return /^[A-Z]+(?:-[A-Z]+)+$/.test(code)
+  return true
+}
+
+/**
  * Picks what to search the other shops for.
  *
  * A part number or model is what actually identifies the product across
@@ -124,7 +150,12 @@ export function deriveSearchKeyword({
   product?: { partNumber?: string | undefined; model?: string | undefined } | undefined
   title?: string | undefined
 } = {}): string {
-  return kw || product?.partNumber || product?.model || (title ? condenseTitleKeyword(title) : '')
+  if (kw) return kw
+  const partNumber = product?.partNumber?.trim()
+  if (partNumber && isSearchableModelCode(partNumber)) return partNumber
+  const model = product?.model?.trim()
+  if (model && isSearchableModelCode(model)) return model
+  return title ? condenseTitleKeyword(title) : ''
 }
 
 /** Builds every shop link a set of credentials allows for one search keyword. */

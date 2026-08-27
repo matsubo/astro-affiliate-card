@@ -160,4 +160,66 @@ describe('deriveSearchKeyword', () => {
       expect('ABCDEFGHIJ 0123456789 abcdefghij klmnop'.split(' ')).toContain(token)
     }
   })
+
+  // The Creators API also stuffs internal SKUs, brand names and variant
+  // phrases into partNumber/model. Searching Rakuten for one of those lands
+  // on zero results -- worse than the title fallback it replaced.
+  test('rejects an internal SKU and falls back to the title', () => {
+    const title = 'RTL-SDR Blog V3 R860 RTL2832U 1PPM TCXO SMA ソフトウェア デファインド ラジオ'
+    const keyword = deriveSearchKeyword({ title, product: { partNumber: 'rtlsdr_only' } })
+    expect(keyword).not.toBe('rtlsdr_only')
+    expect(keyword.startsWith('RTL-SDR')).toBe(true)
+  })
+
+  test('rejects a bare lowercase word as a part number', () => {
+    expect(
+      deriveSearchKeyword({
+        title: 'Modern Operating Systems',
+        product: { partNumber: 'illustrations' },
+      }),
+    ).toBe('Modern Operating Systems')
+  })
+
+  test('rejects a brand name in the part number field', () => {
+    expect(
+      deriveSearchKeyword({
+        title: 'ホルツ ペイント塗料 プラサフ グレー',
+        product: { partNumber: 'ホルツ', model: 'MH11503' },
+      }),
+    ).toBe('MH11503')
+  })
+
+  test('rejects a multi-token phrase as a part number', () => {
+    expect(
+      deriveSearchKeyword({
+        title: 'ハーマンミラー エンボディチェア',
+        product: { partNumber: 'CN122AWAA G1 G1 BB 3513' },
+      }),
+    ).toBe('ハーマンミラー エンボディチェア')
+  })
+
+  test('rejects a variant phrase with parentheses', () => {
+    expect(
+      deriveSearchKeyword({
+        title: 'LOWEPRO カメラリュック フリップサイド300',
+        product: { partNumber: 'Flipside 300 (Black)' },
+      }),
+    ).toBe('LOWEPRO カメラリュック フリップサイド300')
+  })
+
+  test('keeps real retail model codes', () => {
+    expect(
+      deriveSearchKeyword({ title: 'コメット アンテナ', product: { partNumber: 'M-24S' } }),
+    ).toBe('M-24S')
+    expect(deriveSearchKeyword({ title: 'アンテナ', product: { partNumber: 'SG7500' } })).toBe(
+      'SG7500',
+    )
+    expect(
+      deriveSearchKeyword({ title: 'ウォークマン', product: { partNumber: 'NW-E405 B' } }),
+    ).toBe('NW-E405 B')
+    // Letters-only dashed codes are model codes too (Topeak TJB-SPT).
+    expect(
+      deriveSearchKeyword({ title: 'トピーク ポンプ', product: { partNumber: 'TJB-SPT' } }),
+    ).toBe('TJB-SPT')
+  })
 })
