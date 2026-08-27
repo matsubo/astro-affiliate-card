@@ -167,9 +167,10 @@ fetch"`). The bin name does not change, so that script does not either.
 Only after all five sites are green:
 
 - `npm deprecate astro-affiliate-card@"*" "Renamed to remark-affiliate-card."`
-  The published 0.x versions stay installable; the two commits made after 0.4.1
-  (the optional astro peer, and the dependency-declaration fix) are never
-  released under the old name — they ship in 1.0.0.
+  The published 0.x versions stay installable. Neither commit made after 0.4.1
+  is ever released under the old name: the dependency-declaration fix (c70cb12)
+  ships in 1.0.0, and making the astro peer optional is superseded outright,
+  since 1.0.0 has no astro peer to mark.
 - `matsubo/astro-affiliate-card` gets a README notice pointing at the new
   repository, then `gh repo archive`. Archiving is last because it makes the
   repository read-only.
