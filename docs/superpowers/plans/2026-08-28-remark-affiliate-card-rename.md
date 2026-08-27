@@ -99,14 +99,16 @@ Expected: both fetch and push read `matsubo/remark-affiliate-card`.
 - [ ] **Step 5: Verify the history and the tree came across**
 
 ```sh
-git log --oneline | wc -l          # expect 42
-git log --oneline -1               # expect the spec commit, not dad3a20
+OLD=/Volumes/nvme/matsu/ghq/github.com/matsubo/astro-affiliate-card
+test "$(git log --oneline | wc -l)" = "$(git -C $OLD log --oneline | wc -l)" && echo 'same depth'
 git log --oneline | grep 3d6347f   # the partNumber decision must be present
-ls docs/superpowers/specs/         # the design doc must be here
+ls docs/superpowers/specs/ docs/superpowers/plans/
 bun install && bun run test:coverage
 ```
 
-Expected: 42 commits, `3d6347f` present, 185 tests pass, every file at 100%.
+Expected: `same depth`, `3d6347f` present, the spec and this plan both listed,
+185 tests pass, every file at 100%. The count is compared against the source
+repository rather than hard-coded, so amending the plan cannot make this step lie.
 
 Note: `git clone` of a local path brings no tags by default in some git versions; the
 old repository's `v0.x` tags are deliberately *not* wanted here, so do not fetch them.
@@ -238,6 +240,7 @@ package is expected to do."
 **Files:**
 - Modify: `package.json`
 - Modify: `bun.lock` (by `bun install`)
+- Modify: `src/remark.ts:132` — a docstring naming the specifier this task deletes
 
 **Interfaces:**
 - Consumes: the barrel from Task 2.
@@ -265,7 +268,23 @@ In `package.json`:
 bun remove astro
 ```
 
-- [ ] **Step 3: Verify nothing reaches for astro any more**
+- [ ] **Step 3: Fix the docstring that names the dropped specifier**
+
+`src/remark.ts:132` shows sites how to import the factory, using the `./remark`
+subpath this task removes. It is the only reference to the old name left in `src/`
+after Task 2:
+
+```
+ * import { createRemarkAmazon } from 'astro-affiliate-card/remark'
+```
+
+becomes
+
+```
+ * import { createRemarkAmazon } from 'remark-affiliate-card'
+```
+
+- [ ] **Step 4: Verify nothing reaches for astro any more**
 
 ```sh
 grep -rn "astro" package.json                    # expect only the "astro" keyword
@@ -277,7 +296,7 @@ node -e "import('./dist/index.js').then(m => console.log(typeof m.default, Objec
 
 Expected: the `node -e` line prints `function` and a key count of at least 12.
 
-- [ ] **Step 4: Run the full gate**
+- [ ] **Step 5: Run the full gate**
 
 ```sh
 bun run lint:ci && bun run typecheck && bun run test:coverage && bun run build
@@ -285,10 +304,10 @@ bun run lint:ci && bun run typecheck && bun run test:coverage && bun run build
 
 Expected: all pass. This is exactly what `prepublishOnly` will run in Task 6.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 6: Commit**
 
 ```sh
-git add package.json bun.lock
+git add package.json bun.lock src/remark.ts
 git commit -m "feat!: rename the package to remark-affiliate-card
 
 Nothing shipped depends on Astro: the only external runtime import in the
