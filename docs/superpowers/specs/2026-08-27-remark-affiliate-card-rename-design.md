@@ -1,7 +1,8 @@
 # Renaming to remark-affiliate-card — Design
 
 **Date:** 2026-08-27
-**Status:** approved, not yet executed
+**Status:** direction approved (the three decisions below, and the one-wave
+cutover); this document itself is awaiting review
 
 ## Why
 
@@ -174,6 +175,11 @@ Only after all five sites are green:
 - `matsubo/astro-affiliate-card` gets a README notice pointing at the new
   repository, then `gh repo archive`. Archiving is last because it makes the
   repository read-only.
+- Landing that notice means pushing local `main` to the old origin, which
+  carries the four unpushed post-0.4.1 commits with it (`1bd9962`, `c70cb12`,
+  and the two that added this spec). That is intended: none of them was ever
+  published to npm under the old name, and leaving the old repository behind
+  its own final state would be the less honest option.
 
 ## Testing
 
@@ -192,7 +198,9 @@ Only after all five sites are green:
 Each of these is a separate explicit go-ahead, not covered by approving this
 design:
 
-- every `git push`, in the new repository and in all five sites
+- `gh repo create matsubo/remark-affiliate-card --public`
+- every `git push` — the new repository, all five sites, and the old repository's
+  final README notice
 - `npm publish` of `remark-affiliate-card@1.0.0`
 - `npm deprecate` of `astro-affiliate-card`
 - `gh repo archive` of the old repository
