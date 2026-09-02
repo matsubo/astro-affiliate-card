@@ -1,5 +1,11 @@
 # astro-affiliate-card
 
+> **Renamed.** This package is now
+> [`remark-affiliate-card`](https://github.com/matsubo/remark-affiliate-card).
+> Nothing it shipped depended on Astro, so it is named for what it is: a remark
+> plugin. `astro-affiliate-card@0.4.1` stays on npm and keeps working, including
+> the Astro integration that the new package drops.
+
 [![npm](https://img.shields.io/npm/v/astro-affiliate-card?logo=npm&color=cb3837)](https://www.npmjs.com/package/astro-affiliate-card)
 [![CI](https://github.com/matsubo/astro-affiliate-card/actions/workflows/ci.yml/badge.svg)](https://github.com/matsubo/astro-affiliate-card/actions/workflows/ci.yml)
 [![astro](https://img.shields.io/badge/astro-%3E%3D4-BC52EE?logo=astro&logoColor=white)](https://astro.build)
